@@ -1,56 +1,56 @@
 {% extends "base.html" %}
 
-{% block title %}Dashboard - Stockv01 Management{% endblock %}
+{% block title %}Painel - Gestão Stockv01{% endblock %}
 
 {% block content %}
 <div class="row">
     <div class="col-md-12">
         <div class="d-flex justify-content-between align-items-center mb-4">
-            <h1>📊 Dashboard</h1>
+            <h1>📊 Painel</h1>
             <button class="btn btn-primary" id="refreshBtn">
-                <i class="bi bi-arrow-clockwise"></i> Actualizar
+                <i class="bi bi-arrow-clockwise"></i> Atualizar
             </button>
         </div>
         
-        <!-- Cards de Estadísticas -->
+        <!-- Cards de Estatísticas -->
         <div class="row mb-4" id="statsCards">
-            <!-- Cargando -->
+            <!-- Carregando -->
             <div class="col-md-12 text-center py-4">
                 <div class="spinner-border text-primary" role="status">
-                    <span class="visually-hidden">Cargando...</span>
+                    <span class="visually-hidden">Carregando...</span>
                 </div>
             </div>
         </div>
         
         <!-- Alertas -->
         <div class="row mb-4" id="alertsSection">
-            <!-- Aquí irán las alertas -->
+            <!-- Aqui aparecerão os alertas -->
         </div>
         
-        <!-- Últimos Movimientos -->
+        <!-- Últimas Movimentações -->
         <div class="row">
             <div class="col-md-12">
                 <div class="card shadow-sm">
                     <div class="card-header bg-success text-white">
-                        <h5 class="mb-0">📝 Últimos 10 Movimientos</h5>
+                        <h5 class="mb-0">📝 Últimas 10 Movimentações</h5>
                     </div>
                     <div class="card-body p-0">
                         <div class="table-responsive">
                             <table class="table table-hover mb-0" id="movimientosTable">
                                 <thead class="table-light">
                                     <tr>
-                                        <th>Fecha</th>
+                                        <th>Data</th>
                                         <th>Tipo</th>
-                                        <th>Producto</th>
+                                        <th>Produto</th>
                                         <th>Grupo</th>
-                                        <th class="text-end">Cantidad</th>
+                                        <th class="text-end">Quantidade</th>
                                     </tr>
                                 </thead>
                                 <tbody id="movimientosBody">
                                     <tr>
                                         <td colspan="5" class="text-center py-4">
                                             <div class="spinner-border spinner-border-sm text-success" role="status">
-                                                <span class="visually-hidden">Cargando...</span>
+                                                <span class="visually-hidden">Carregando...</span>
                                             </div>
                                         </td>
                                     </tr>
@@ -64,10 +64,10 @@
     </div>
 </div>
 
-<!-- Alerta de error -->
+<!-- Alerta de erro -->
 <div class="alert alert-danger alert-dismissible fade show d-none" id="errorAlert" role="alert">
-    <strong>Error:</strong> <span id="errorMessage"></span>
-    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    <strong>Erro:</strong> <span id="errorMessage"></span>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fechar"></button>
 </div>
 
 {% endblock %}
