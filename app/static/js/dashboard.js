@@ -1,6 +1,6 @@
 /**
- * Script para el Dashboard
- * Carga estadísticas y alertas de inventario
+ * Script do Dashboard
+ * Carrega estatísticas e alertas do inventário
  */
 
 class Dashboard {
@@ -11,7 +11,7 @@ class Dashboard {
     }
     
     /**
-     * Inicializar referencias a elementos DOM
+     * Inicializar referências a elementos DOM
      */
     initializeElements() {
         this.statsCards = document.getElementById('statsCards');
@@ -23,20 +23,20 @@ class Dashboard {
     }
     
     /**
-     * Adjuntar event listeners
+     * Adicionar event listeners
      */
     attachEventListeners() {
         this.refreshBtn.addEventListener('click', () => this.loadDashboard());
     }
     
     /**
-     * Cargar todos los datos del dashboard
+     * Carregar todos os dados do dashboard
      */
     async loadDashboard() {
         try {
             this.hideError();
             
-            // Cargar stats y movimientos en paralelo
+            // Carregar stats e movimentos em paralelo
             const [statsData, movimientosData] = await Promise.all([
                 this.fetchStats(),
                 this.fetchMovimientos()
@@ -47,51 +47,51 @@ class Dashboard {
             this.renderMovimientos(movimientosData);
             
         } catch (error) {
-            console.error('Error:', error);
+            console.error('Erro:', error);
             this.showError(error.message);
         }
     }
     
     /**
-     * Obtener estadísticas del API
+     * Obter estatísticas da API
      */
     async fetchStats() {
         const response = await fetch('/api/dashboard/stats');
         
         if (!response.ok) {
-            throw new Error(`Error HTTP: ${response.status}`);
+            throw new Error(`Erro HTTP: ${response.status}`);
         }
         
         const data = await response.json();
         
         if (!data.success) {
-            throw new Error(data.error || 'Error al cargar estadísticas');
+            throw new Error(data.error || 'Erro ao carregar estatísticas');
         }
         
         return data;
     }
     
     /**
-     * Obtener movimientos recientes del API
+     * Obter movimentos recentes da API
      */
     async fetchMovimientos() {
         const response = await fetch('/api/dashboard/movimientos-recientes');
         
         if (!response.ok) {
-            throw new Error(`Error HTTP: ${response.status}`);
+            throw new Error(`Erro HTTP: ${response.status}`);
         }
         
         const data = await response.json();
         
         if (!data.success) {
-            throw new Error(data.error || 'Error al cargar movimientos');
+            throw new Error(data.error || 'Erro ao carregar movimentos');
         }
         
         return data;
     }
     
     /**
-     * Renderizar tarjetas de estadísticas
+     * Renderizar cards de estatísticas
      */
     renderStats(data) {
         const stats = data.stats;
@@ -100,7 +100,7 @@ class Dashboard {
             <div class="col-md-3 mb-3">
                 <div class="card border-primary shadow-sm h-100">
                     <div class="card-body">
-                        <h6 class="card-title text-muted">📦 Total Stock</h6>
+                        <h6 class="card-title text-muted">📦 Total em Estoque</h6>
                         <h2 class="mb-0 text-primary">${stats.total_stock}</h2>
                     </div>
                 </div>
@@ -132,7 +132,7 @@ class Dashboard {
             <div class="col-md-3 mb-3">
                 <div class="card border-danger shadow-sm h-100">
                     <div class="card-body">
-                        <h6 class="card-title text-muted">🍎 Frutales</h6>
+                        <h6 class="card-title text-muted">🍎 Frutais</h6>
                         <h2 class="mb-0 text-danger">${stats.frutales}</h2>
                     </div>
                 </div>
@@ -140,7 +140,7 @@ class Dashboard {
             <div class="col-md-3 mb-3">
                 <div class="card border-secondary shadow-sm h-100">
                     <div class="card-body">
-                        <h6 class="card-title text-muted">🥛 Lácteos</h6>
+                        <h6 class="card-title text-muted">🥛 Laticínios</h6>
                         <h2 class="mb-0 text-secondary">${stats.lacteos}</h2>
                     </div>
                 </div>
@@ -160,39 +160,39 @@ class Dashboard {
         // Alerta de vencidos
         if (alerts.vencidos > 0) {
             alertsHtml += this.renderAlertCard(
-                '🚨 PRODUCTOS VENCIDOS',
-                `${alerts.vencidos} producto(s) vencido(s)`,
+                '🚨 PRODUTOS VENCIDOS',
+                `${alerts.vencidos} produto(s) vencido(s)`,
                 alerts.vencidos_lista,
                 'danger'
             );
         }
         
-        // Alerta de vencer en 3 días
+        // Alerta: vencem em 3 dias
         if (alerts.vencen_3_dias > 0) {
             alertsHtml += this.renderAlertCard(
-                '⚠️ VENCEN EN 3 DÍAS',
-                `${alerts.vencen_3_dias} producto(s) proximos a vencer`,
+                '⚠️ VENCEM EM 3 DIAS',
+                `${alerts.vencen_3_dias} produto(s) próximos de vencer`,
                 alerts.vencen_3_dias_lista,
                 'warning'
             );
         }
         
-        // Alerta de vencer en 7 días
+        // Alerta: vencem em 7 dias
         if (alerts.vencen_7_dias > 0) {
             alertsHtml += this.renderAlertCard(
-                '⏰ VENCEN EN 7 DÍAS',
-                `${alerts.vencen_7_dias} producto(s) proximos a vencer`,
+                '⏰ VENCEM EM 7 DIAS',
+                `${alerts.vencen_7_dias} produto(s) próximos de vencer`,
                 alerts.vencen_7_dias_lista,
                 'info'
             );
         }
         
-        // Si no hay alertas
+        // Se não houver alertas
         if (alertsHtml === '') {
             alertsHtml = `
                 <div class="col-md-12 mb-3">
                     <div class="alert alert-success alert-dismissible fade show" role="alert">
-                        <strong>✅ ¡Excelente!</strong> No hay productos vencidos o proximos a vencer.
+                        <strong>✅ Excelente!</strong> Não há produtos vencidos ou próximos de vencer.
                         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                     </div>
                 </div>
@@ -203,17 +203,16 @@ class Dashboard {
     }
     
     /**
-     * Renderizar una tarjeta de alerta
+     * Renderizar um card de alerta
      */
     renderAlertCard(titulo, subtitulo, productos, tipo) {
-        const alertClass = `alert-${tipo}`;
         const borderClass = `border-${tipo}`;
         
         const productosHtml = productos.map(p => `
             <div class="alert alert-${tipo} mb-2 py-2 px-3">
                 <strong>${this.escapeHtml(p.nombre)}</strong>
                 <br>
-                <small>Grupo: ${this.escapeHtml(p.grupo)} | Cantidad: ${p.cantidad}</small>
+                <small>Grupo: ${this.escapeHtml(p.grupo)} | Quantidade: ${p.cantidad}</small>
             </div>
         `).join('');
         
@@ -233,16 +232,16 @@ class Dashboard {
     }
     
     /**
-     * Renderizar últimos movimientos
+     * Renderizar últimos movimentos
      */
     renderMovimientos(data) {
         if (!data.data || data.data.length === 0) {
-            this.movimientosBody.innerHTML = '<tr><td colspan="5" class="text-center py-4">Sin movimientos</td></tr>';
+            this.movimientosBody.innerHTML = '<tr><td colspan="5" class="text-center py-4">Sem movimentos</td></tr>';
             return;
         }
         
         this.movimientosBody.innerHTML = data.data.map(mov => {
-            const fecha = new Date(mov.fecha).toLocaleDateString('es-AR', {
+            const fecha = new Date(mov.fecha).toLocaleDateString('pt-BR', {
                 year: 'numeric',
                 month: '2-digit',
                 day: '2-digit',
@@ -251,8 +250,8 @@ class Dashboard {
             });
             
             const tipoColor = this.getTipoColor(mov.tipo);
-            const cantidadClass = mov.cantidad < 0 ? 'text-danger' : 'text-success';
-            const cantidadSign = mov.cantidad < 0 ? '' : '+';
+            const quantidadeClass = mov.cantidad < 0 ? 'text-danger' : 'text-success';
+            const sinal = mov.cantidad < 0 ? '' : '+';
             
             return `
                 <tr>
@@ -261,7 +260,7 @@ class Dashboard {
                     <td>${this.escapeHtml(mov.producto)}</td>
                     <td><span class="badge bg-light text-dark">${this.escapeHtml(mov.grupo)}</span></td>
                     <td class="text-end">
-                        <strong class="${cantidadClass}">${cantidadSign}${mov.cantidad}</strong>
+                        <strong class="${quantidadeClass}">${sinal}${mov.cantidad}</strong>
                     </td>
                 </tr>
             `;
@@ -269,7 +268,7 @@ class Dashboard {
     }
     
     /**
-     * Obtener color por tipo de movimiento
+     * Obter cor por tipo de movimento
      */
     getTipoColor(tipo) {
         const colors = {
@@ -282,7 +281,7 @@ class Dashboard {
     }
     
     /**
-     * Mostrar error
+     * Mostrar erro
      */
     showError(message) {
         this.errorMessage.textContent = message;
@@ -294,7 +293,7 @@ class Dashboard {
     }
     
     /**
-     * Ocultar error
+     * Ocultar erro
      */
     hideError() {
         this.errorAlert.classList.add('d-none');
@@ -311,8 +310,9 @@ class Dashboard {
 }
 
 /**
- * Inicializar cuando el DOM está listo
+ * Inicializar quando o DOM estiver pronto
  */
 document.addEventListener('DOMContentLoaded', () => {
     new Dashboard();
 });
+```0
