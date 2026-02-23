@@ -1,11 +1,11 @@
 {% extends "base.html" %}
 
-{% block title %}Movimientos - Stockv01 Management{% endblock %}
+{% block title %}Movimentações - Gestão Stockv01{% endblock %}
 
 {% block content %}
 <div class="row">
     <div class="col-md-12">
-        <h1 class="mb-4">📊 Movimientos de Inventario</h1>
+        <h1 class="mb-4">📊 Movimentações de Estoque</h1>
         
         <!-- Filtros -->
         <div class="card mb-4 shadow-sm">
@@ -14,15 +14,15 @@
             </div>
             <div class="card-body">
                 <form id="filterForm" class="row g-3">
-                    <!-- Fecha Desde -->
+                    <!-- Data De -->
                     <div class="col-md-2">
-                        <label for="fechaDesdeFilter" class="form-label">Desde</label>
+                        <label for="fechaDesdeFilter" class="form-label">De</label>
                         <input type="date" class="form-control" id="fechaDesdeFilter">
                     </div>
                     
-                    <!-- Fecha Hasta -->
+                    <!-- Data Até -->
                     <div class="col-md-2">
-                        <label for="fechaHastaFilter" class="form-label">Hasta</label>
+                        <label for="fechaHastaFilter" class="form-label">Até</label>
                         <input type="date" class="form-control" id="fechaHastaFilter">
                     </div>
                     
@@ -32,7 +32,7 @@
                         <select class="form-select" id="tipoFilter">
                             <option value="">Todos</option>
                             <option value="entrada">Entrada</option>
-                            <option value="saida">Salida</option>
+                            <option value="saida">Saída</option>
                             <option value="descarte">Descarte</option>
                             <option value="ajuste">Ajuste</option>
                         </select>
@@ -41,16 +41,16 @@
                     <!-- Grupo -->
                     <div class="col-md-2">
                         <label for="grupoFilter" class="form-label">Grupo</label>
-                        <input type="text" class="form-control" id="grupoFilter" placeholder="Ej: Electrónica">
+                        <input type="text" class="form-control" id="grupoFilter" placeholder="Ex: Hortifruti">
                     </div>
                     
-                    <!-- Botón Filtrar -->
+                    <!-- Botões -->
                     <div class="col-md-3 d-flex align-items-end">
                         <button type="button" class="btn btn-info w-100" id="filterBtn">
                             <i class="bi bi-search"></i> Filtrar
                         </button>
                         <button type="button" class="btn btn-secondary w-100 ms-2" id="resetBtn">
-                            Limpiar
+                            Limpar
                         </button>
                     </div>
                 </form>
@@ -78,7 +78,7 @@
             <div class="col-md-2">
                 <div class="card text-center border-danger">
                     <div class="card-body">
-                        <h6 class="card-title text-muted">Saidas</h6>
+                        <h6 class="card-title text-muted">Saídas</h6>
                         <h3 class="mb-0 text-danger" id="saidaCount">0</h3>
                     </div>
                 </div>
@@ -102,34 +102,34 @@
             <div class="col-md-2">
                 <div class="card text-center">
                     <div class="card-body">
-                        <h6 class="card-title text-muted">Mostrados</h6>
+                        <h6 class="card-title text-muted">Exibidos</h6>
                         <h3 class="mb-0" id="shownCount">0</h3>
                     </div>
                 </div>
             </div>
         </div>
         
-        <!-- Tabla -->
+        <!-- Tabela -->
         <div class="card shadow-sm">
             <div class="card-body p-0">
                 <div class="table-responsive">
                     <table class="table table-hover mb-0" id="movimientosTable">
                         <thead class="table-dark text-white">
                             <tr>
-                                <th>Fecha</th>
+                                <th>Data</th>
                                 <th>Tipo</th>
                                 <th>Grupo</th>
-                                <th>Producto</th>
-                                <th class="text-end">Cantidad</th>
-                                <th>Descripción</th>
-                                <th>Usuario</th>
+                                <th>Produto</th>
+                                <th class="text-end">Quantidade</th>
+                                <th>Descrição</th>
+                                <th>Usuário</th>
                             </tr>
                         </thead>
                         <tbody id="movimientosTableBody">
                             <tr class="text-center">
                                 <td colspan="7" class="py-4">
                                     <div class="spinner-border text-info" role="status">
-                                        <span class="visually-hidden">Cargando...</span>
+                                        <span class="visually-hidden">Carregando...</span>
                                     </div>
                                 </td>
                             </tr>
@@ -139,29 +139,29 @@
             </div>
         </div>
         
-        <!-- Paginación -->
+        <!-- Paginação -->
         <div class="d-flex justify-content-between align-items-center mt-4">
             <div>
                 <small class="text-muted" id="paginationInfo">Página 1 de 1</small>
             </div>
             <div>
                 <button class="btn btn-sm btn-outline-info me-2" id="prevBtn" disabled>← Anterior</button>
-                <button class="btn btn-sm btn-outline-info" id="nextBtn" disabled>Siguiente →</button>
+                <button class="btn btn-sm btn-outline-info" id="nextBtn" disabled>Próximo →</button>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Mensaje de error -->
+<!-- Mensagem de erro -->
 <div class="alert alert-danger alert-dismissible fade show d-none" id="errorAlert" role="alert">
-    <strong>Error:</strong> <span id="errorMessage"></span>
-    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    <strong>Erro:</strong> <span id="errorMessage"></span>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fechar"></button>
 </div>
 
-<!-- Mensaje sin resultados -->
+<!-- Mensagem sem resultados -->
 <div class="alert alert-info mt-4 d-none text-center" id="noResultsAlert" role="alert">
-    <h5>📭 Sin resultados</h5>
-    <p>No se encontraron movimientos que coincidan con los filtros aplicados.</p>
+    <h5>📭 Nenhum resultado</h5>
+    <p>Não foram encontradas movimentações que correspondam aos filtros aplicados.</p>
 </div>
 
 {% endblock %}
