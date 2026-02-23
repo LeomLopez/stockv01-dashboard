@@ -467,3 +467,5 @@ Para reportar problemas o sugerencias, crea un issue en el repositorio.
 ---
 
 **Creado con ❤️ Febrero 2026**
+#   s t o c k v 0 1 - d a s h b o a r d  
+ 
