@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Movimentações - Gestão Stockv01{% endblock %}
+{% block title %}Movimentações - Gestão de Estoque v01{% endblock %}
 
 {% block content %}
 <div class="row">
@@ -41,7 +41,14 @@
                     <!-- Grupo -->
                     <div class="col-md-2">
                         <label for="grupoFilter" class="form-label">Grupo</label>
-                        <input type="text" class="form-control" id="grupoFilter" placeholder="Ex: Hortifruti">
+                        <select class="form-select" id="grupoFilter">
+                            <option value="">Todos</option>
+                            {% if grupos %}
+                                {% for grupo in grupos %}
+                                    <option value="{{ grupo }}">{{ grupo }}</option>
+                                {% endfor %}
+                            {% endif %}
+                        </select>
                     </div>
                     
                     <!-- Botões -->

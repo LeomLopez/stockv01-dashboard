@@ -96,12 +96,12 @@ def get_stock():
         
         # Validar límites de paginación
         if limit is None:
-            return error_response('Parámetro limit inválido. Debe ser un número entre 1 y 1000', 400)
+            return error_response('Parâmetro limit inválido. Deve ser um número entre 1 e 1000', 400)
         if limit < 1 or limit > 1000:
-            return error_response('Parámetro limit debe estar entre 1 y 1000', 400)
+            return error_response('O parâmetro limit deve estar entre 1 e 1000', 400)
         
         if offset < 0:
-            return error_response('Parámetro offset no puede ser negativo', 400)
+            return error_response('O parâmetro offset não pode ser negativo', 400)
         
         # Construir consulta SQL directa contra la tabla/view stock_actual
         # Usar columnas explícitas para evitar dependencias en el modelo
@@ -182,7 +182,7 @@ def get_stock():
     
     except Exception as e:
         logger.error(f'Error en GET /api/stock: {str(e)}')
-        return error_response(f'Error interno del servidor: {str(e)}', 500)
+        return error_response(f'Erro interno do servidor: {str(e)}', 500)
 
 
 @api_bp.route('/movimientos', methods=['GET'])
@@ -215,10 +215,10 @@ def get_movimientos():
         
         # Validar límites de paginación
         if limit is None or limit < 1 or limit > 1000:
-            return error_response('Parámetro limit debe estar entre 1 y 1000', 400)
+            return error_response('O parâmetro limit deve estar entre 1 e 1000', 400)
         
         if offset < 0:
-            return error_response('Parámetro offset no puede ser negativo', 400)
+            return error_response('O parâmetro offset não pode ser negativo', 400)
         
         # Validar y convertir fechas
         fecha_desde_dt = None
@@ -228,7 +228,7 @@ def get_movimientos():
             fecha_desde_dt = safe_datetime(fecha_desde)
             if not fecha_desde_dt:
                 return error_response(
-                    'Parámetro fecha_desde inválido. Use formato YYYY-MM-DD o YYYY-MM-DD HH:MM:SS',
+                    'Parâmetro fecha_desde inválido. Use o formato YYYY-MM-DD ou YYYY-MM-DD HH:MM:SS',
                     400,
                     {'received': fecha_desde}
                 )
@@ -237,7 +237,7 @@ def get_movimientos():
             fecha_hasta_dt = safe_datetime(fecha_hasta)
             if not fecha_hasta_dt:
                 return error_response(
-                    'Parámetro fecha_hasta inválido. Use formato YYYY-MM-DD o YYYY-MM-DD HH:MM:SS',
+                    'Parâmetro fecha_hasta inválido. Use o formato YYYY-MM-DD ou YYYY-MM-DD HH:MM:SS',
                     400,
                     {'received': fecha_hasta}
                 )
@@ -245,7 +245,7 @@ def get_movimientos():
         # Validar que fecha_desde <= fecha_hasta
         if fecha_desde_dt and fecha_hasta_dt and fecha_desde_dt > fecha_hasta_dt:
             return error_response(
-                'fecha_desde no puede ser posterior a fecha_hasta',
+                'fecha_desde não pode ser posterior a fecha_hasta',
                 400
             )
         
@@ -254,7 +254,7 @@ def get_movimientos():
             tipos_validos = ['entrada', 'salida', 'ajuste']
             if tipo not in tipos_validos:
                 return error_response(
-                    f'Parámetro tipo inválido. Valores válidos: {", ".join(tipos_validos)}',
+                    f'Parâmetro tipo inválido. Valores válidos: {", ".join(tipos_validos)}',
                     400
                 )
         
@@ -296,16 +296,16 @@ def get_movimientos():
     
     except Exception as e:
         logger.error(f'Error en GET /api/movimientos: {str(e)}')
-        return error_response(f'Error interno del servidor: {str(e)}', 500)
+        return error_response(f'Erro interno do servidor: {str(e)}', 500)
 
 
 @api_bp.errorhandler(404)
 def not_found(error):
     """Manejar rutas no encontradas"""
-    return error_response('Endpoint no encontrado', 404)
+    return error_response('Endpoint não encontrado', 404)
 
 
 @api_bp.errorhandler(405)
 def method_not_allowed(error):
     """Manejar métodos no permitidos"""
-    return error_response('Método HTTP no permitido. Solo se permiten solicitudes GET', 405)
+    return error_response('Método HTTP não permitido. Apenas solicitações GET são permitidas', 405)

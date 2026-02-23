@@ -1,6 +1,6 @@
 /**
- * Script para a página de Estoque
- * Gerencia filtros, fetch da API e atualização dinâmica da tabela
+ * Script para a pagina de Estoque
+ * Carrega dados sob demanda (apos o usuario selecionar um grupo)
  */
 
 class StockManager {
@@ -8,23 +8,20 @@ class StockManager {
         this.currentPage = 0;
         this.limit = 10;
         this.totalRecords = 0;
-        this.currentFilters = {};
+        this.hasLoaded = false;
 
         this.initializeElements();
         this.attachEventListeners();
-        this.loadStock();
+        this.renderInitialState();
     }
 
-    /**
-     * Inicializar referências aos elementos do DOM
-     */
     initializeElements() {
         // Filtros
         this.grupoFilter = document.getElementById('grupoFilter');
         this.productoFilter = document.getElementById('productoFilter');
         this.contenedorFilter = document.getElementById('contenedorFilter');
 
-        // Botões
+        // Botoes
         this.filterBtn = document.getElementById('filterBtn');
         this.prevBtn = document.getElementById('prevBtn');
         this.nextBtn = document.getElementById('nextBtn');
@@ -43,29 +40,36 @@ class StockManager {
         this.errorMessage = document.getElementById('errorMessage');
         this.noResultsAlert = document.getElementById('noResultsAlert');
 
-        // Paginação
+        // Paginacao
         this.paginationInfo = document.getElementById('paginationInfo');
     }
 
-    /**
-     * Anexar event listeners
-     */
     attachEventListeners() {
         this.filterBtn.addEventListener('click', () => this.onFilterClick());
         this.prevBtn.addEventListener('click', () => this.previousPage());
         this.nextBtn.addEventListener('click', () => this.nextPage());
 
-        // Permitir Enter no input de produto
         this.productoFilter.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') {
+                e.preventDefault();
                 this.onFilterClick();
             }
         });
     }
 
-    /**
-     * Construir parâmetros de filtro
-     */
+    renderInitialState() {
+        this.hideError();
+        this.hideNoResults();
+        this.updateIndicators([]);
+        this.totalRecords = 0;
+        this.updatePagination();
+        this.renderMessageRow('Selecione um grupo e clique em Filtrar para carregar o estoque.');
+    }
+
+    hasRequiredFilters() {
+        return Boolean(this.grupoFilter.value.trim());
+    }
+
     buildFilterParams() {
         const params = new URLSearchParams();
 
@@ -77,7 +81,7 @@ class StockManager {
         if (produto) params.append('producto', produto);
         if (contenedor) params.append('contenedor', contenedor);
 
-        // Pedir sempre raw=true para mostrar exatamente o que há no banco de dados
+        // Mostra exatamente os registros da fonte (sem consolidar)
         params.append('raw', 'true');
         params.append('limit', this.limit);
         params.append('offset', this.currentPage * this.limit);
@@ -85,10 +89,17 @@ class StockManager {
         return params.toString();
     }
 
-    /**
-     * Carregar dados de estoque a partir da API
-     */
     async loadStock() {
+        if (!this.hasRequiredFilters()) {
+            this.hasLoaded = false;
+            this.totalRecords = 0;
+            this.hideNoResults();
+            this.updateIndicators([]);
+            this.updatePagination();
+            this.renderMessageRow('Selecione um grupo para consultar o estoque.');
+            return;
+        }
+
         try {
             this.showLoading();
             this.hideError();
@@ -107,29 +118,29 @@ class StockManager {
                 throw new Error(data.error || 'Erro ao carregar estoque');
             }
 
-            this.totalRecords = data.pagination.total;
-            this.renderStock(data.data);
-            this.updateIndicators(data.data);
+            this.hasLoaded = true;
+            this.totalRecords = data.pagination?.total || 0;
+            this.renderStock(data.data || []);
+            this.updateIndicators(data.data || []);
             this.updatePagination();
 
-            if (data.data.length === 0) {
+            if (!data.data || data.data.length === 0) {
                 this.showNoResults();
             }
-
         } catch (error) {
             console.error('Erro:', error);
             this.showError(error.message);
-            this.stockTableBody.innerHTML = '';
+            this.hasLoaded = false;
+            this.totalRecords = 0;
             this.updateIndicators([]);
+            this.updatePagination();
+            this.renderMessageRow('Falha ao carregar os dados do estoque.');
         }
     }
 
-    /**
-     * Renderizar tabela de estoque
-     */
     renderStock(items) {
         if (items.length === 0) {
-            this.stockTableBody.innerHTML = '<tr><td colspan="5" class="text-center py-4">Sem dados</td></tr>';
+            this.renderMessageRow('Nenhum dado');
             return;
         }
 
@@ -141,36 +152,37 @@ class StockManager {
                 quantidade <= 0 ? 'text-danger fw-bold' :
                 quantidade < 10 ? 'text-warning fw-bold' : '';
 
-            const dataProduto = new Date(item.fecha_producto).toLocaleDateString('pt-BR', {
-                year: 'numeric',
-                month: '2-digit',
-                day: '2-digit'
-            });
+            const dataProduto = item.fecha_producto
+                ? new Date(item.fecha_producto).toLocaleDateString('pt-BR', {
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit'
+                })
+                : '-';
 
             return `
                 <tr class="${rowClass}">
-                    <td>
-                        <span class="badge bg-info">${this.escapeHtml(item.grupo)}</span>
-                    </td>
+                    <td><span class="badge bg-info">${this.escapeHtml(item.grupo)}</span></td>
                     <td>${this.escapeHtml(item.producto)}</td>
                     <td class="text-end">
                         <span class="${quantidadeClass}">${quantidade}</span>
                         ${quantidade <= 0 ? '<span class="badge bg-danger ms-2">SEM ESTOQUE</span>' : ''}
                     </td>
-                    <td>
-                        <code>${this.escapeHtml(contenedor)}</code>
-                    </td>
-                    <td>
-                        <small class="text-muted">${dataProduto}</small>
-                    </td>
+                    <td><code>${this.escapeHtml(contenedor)}</code></td>
+                    <td><small class="text-muted">${dataProduto}</small></td>
                 </tr>
             `;
         }).join('');
     }
 
-    /**
-     * Atualizar indicadores
-     */
+    renderMessageRow(message) {
+        this.stockTableBody.innerHTML = `
+            <tr class="text-center">
+                <td colspan="5" class="py-4 text-muted">${this.escapeHtml(message)}</td>
+            </tr>
+        `;
+    }
+
     updateIndicators(items) {
         const lowStock = items.filter(i => i.cantidad > 0 && i.cantidad < 10).length;
         const noStock = items.filter(i => i.cantidad <= 0).length;
@@ -180,3 +192,98 @@ class StockManager {
         this.lowStockCount.textContent = lowStock;
         this.noStockCount.textContent = noStock;
     }
+
+    updatePagination() {
+        const totalPages = Math.max(1, Math.ceil(this.totalRecords / this.limit));
+        const currentPage = this.currentPage + 1;
+
+        if (!this.hasLoaded) {
+            this.paginationInfo.textContent = 'Aguardando filtro';
+            this.prevBtn.disabled = true;
+            this.nextBtn.disabled = true;
+            return;
+        }
+
+        this.paginationInfo.textContent = `Pagina ${currentPage} de ${totalPages}`;
+        this.prevBtn.disabled = this.currentPage === 0;
+        this.nextBtn.disabled = this.currentPage >= totalPages - 1 || this.totalRecords === 0;
+    }
+
+    onFilterClick() {
+        if (!this.hasRequiredFilters()) {
+            this.showError('Selecione um grupo antes de filtrar.');
+            this.totalRecords = 0;
+            this.hasLoaded = false;
+            this.hideNoResults();
+            this.updateIndicators([]);
+            this.updatePagination();
+            this.renderMessageRow('Selecione um grupo e clique em Filtrar para carregar o estoque.');
+            return;
+        }
+
+        this.currentPage = 0;
+        this.loadStock();
+    }
+
+    previousPage() {
+        if (!this.hasLoaded || this.currentPage <= 0) {
+            return;
+        }
+        this.currentPage -= 1;
+        this.loadStock();
+    }
+
+    nextPage() {
+        if (!this.hasLoaded) {
+            return;
+        }
+        const totalPages = Math.ceil(this.totalRecords / this.limit);
+        if (this.currentPage < totalPages - 1) {
+            this.currentPage += 1;
+            this.loadStock();
+        }
+    }
+
+    showLoading() {
+        this.stockTableBody.innerHTML = `
+            <tr class="text-center">
+                <td colspan="5" class="py-4">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Carregando...</span>
+                    </div>
+                </td>
+            </tr>
+        `;
+    }
+
+    showError(message) {
+        this.errorMessage.textContent = message;
+        this.errorAlert.classList.remove('d-none');
+
+        setTimeout(() => {
+            this.errorAlert.classList.add('d-none');
+        }, 5000);
+    }
+
+    hideError() {
+        this.errorAlert.classList.add('d-none');
+    }
+
+    showNoResults() {
+        this.noResultsAlert.classList.remove('d-none');
+    }
+
+    hideNoResults() {
+        this.noResultsAlert.classList.add('d-none');
+    }
+
+    escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = String(text ?? '');
+        return div.innerHTML;
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    new StockManager();
+});

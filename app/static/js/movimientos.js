@@ -134,7 +134,7 @@ class MovimientosManager {
     renderMovimientos(items) {
         if (items.length === 0) {
             this.movimientosTableBody.innerHTML =
-                '<tr><td colspan="7" class="text-center py-4">Sem dados</td></tr>';
+                '<tr><td colspan="7" class="text-center py-4">Nenhum dado</td></tr>';
             return;
         }
 
@@ -311,4 +311,3 @@ class MovimientosManager {
 document.addEventListener('DOMContentLoaded', () => {
     new MovimientosManager();
 });
-```0

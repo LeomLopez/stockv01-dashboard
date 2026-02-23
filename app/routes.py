@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify, session
 from functools import wraps
-from app.models import db, Product, StockActual
+from app.models import db, Product, StockActual, Movimiento
 from app.auth import verify_credentials
 
 main_bp = Blueprint('main', __name__)
@@ -11,7 +11,7 @@ def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         if 'user' not in session:
-            flash('Debes iniciar sesión para acceder a esta página', 'warning')
+            flash('Você precisa iniciar sessão para acessar esta página', 'warning')
             return redirect(url_for('main.login'))
         return f(*args, **kwargs)
     return decorated_function
@@ -33,7 +33,7 @@ def login():
         password = request.form.get('password')
         
         if not username or not password:
-            flash('Usuario y contraseña son requeridos', 'error')
+            flash('Usuário e senha são obrigatórios', 'error')
             return render_template('login.html')
         
         user = verify_credentials(username, password)
@@ -41,10 +41,10 @@ def login():
         if user:
             session['user'] = user
             session.permanent = True
-            flash(f'Bienvenido {username}', 'success')
+            flash(f'Bem-vindo, {username}', 'success')
             return redirect(url_for('main.dashboard'))
         else:
-            flash('Usuario o contraseña incorrectos', 'error')
+            flash('Usuário ou senha incorretos', 'error')
             return render_template('login.html')
     
     return render_template('login.html')
@@ -54,7 +54,7 @@ def login():
 def logout():
     """Cerrar sesión"""
     session.clear()
-    flash('Has cerrado sesión', 'info')
+    flash('Sessão encerrada', 'info')
     return redirect(url_for('main.login'))
 
 
@@ -79,7 +79,9 @@ def stock():
 @login_required
 def movimientos():
     """Página de movimientos con filtros"""
-    return render_template('movimientos.html')
+    grupos_q = db.session.query(Movimiento.grupo).distinct().order_by(Movimiento.grupo).all()
+    grupos = [g[0] for g in grupos_q if g and g[0]]
+    return render_template('movimientos.html', grupos=grupos)
 
 @main_bp.route('/products')
 def products():
@@ -99,13 +101,13 @@ def add_product():
             
             # Validar que el nombre no esté vacío
             if not name:
-                flash('El nombre del producto es requerido', 'error')
+                flash('O nome do produto é obrigatório', 'error')
                 return render_template('add_product.html', is_edit=False, product=None)
             
             # Verificar si el producto ya existe
             existing = Product.query.filter_by(name=name).first()
             if existing:
-                flash('Un producto con ese nombre ya existe', 'error')
+                flash('Já existe um produto com esse nome', 'error')
                 return render_template('add_product.html', is_edit=False, product=None)
             
             # Crear nuevo producto
@@ -119,12 +121,12 @@ def add_product():
             db.session.add(product)
             db.session.commit()
             
-            flash(f'Producto "{name}" creado exitosamente', 'success')
+            flash(f'Produto "{name}" criado com sucesso', 'success')
             return redirect(url_for('main.products'))
             
         except Exception as e:
             db.session.rollback()
-            flash(f'Error al crear producto: {str(e)}', 'error')
+            flash(f'Erro ao criar produto: {str(e)}', 'error')
             return render_template('add_product.html', is_edit=False, product=None)
     
     return render_template('add_product.html', is_edit=False, product=None)
@@ -143,12 +145,12 @@ def edit_product(id):
             
             db.session.commit()
             
-            flash(f'Producto "{product.name}" actualizado exitosamente', 'success')
+            flash(f'Produto "{product.name}" atualizado com sucesso', 'success')
             return redirect(url_for('main.products'))
             
         except Exception as e:
             db.session.rollback()
-            flash(f'Error al editar producto: {str(e)}', 'error')
+            flash(f'Erro ao editar produto: {str(e)}', 'error')
     
     return render_template('add_product.html', is_edit=True, product=product)
 
@@ -160,10 +162,10 @@ def delete_product(id):
     try:
         db.session.delete(product)
         db.session.commit()
-        flash(f'Producto "{product.name}" eliminado exitosamente', 'success')
+        flash(f'Produto "{product.name}" removido com sucesso', 'success')
     except Exception as e:
         db.session.rollback()
-        flash(f'Error al eliminar producto: {str(e)}', 'error')
+        flash(f'Erro ao remover produto: {str(e)}', 'error')
     
     return redirect(url_for('main.products'))
 

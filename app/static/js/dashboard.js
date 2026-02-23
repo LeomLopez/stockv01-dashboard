@@ -16,7 +16,7 @@ class Dashboard {
     initializeElements() {
         this.statsCards = document.getElementById('statsCards');
         this.alertsSection = document.getElementById('alertsSection');
-        this.movimientosBody = document.getElementById('movimientosBody');
+        this.movimentosResumo = document.getElementById('movimentosResumo');
         this.refreshBtn = document.getElementById('refreshBtn');
         this.errorAlert = document.getElementById('errorAlert');
         this.errorMessage = document.getElementById('errorMessage');
@@ -35,20 +35,41 @@ class Dashboard {
     async loadDashboard() {
         try {
             this.hideError();
-            
-            // Carregar stats e movimentos em paralelo
-            const [statsData, movimientosData] = await Promise.all([
-                this.fetchStats(),
-                this.fetchMovimientos()
-            ]);
-            
+
+            // Carregar primeiro o essencial (stats + alertas)
+            const statsData = await this.fetchStats();
             this.renderStats(statsData);
             this.renderAlerts(statsData);
-            this.renderMovimientos(movimientosData);
-            
+
+            // Carregar resumo de movimentos depois (carga diferida)
+            this.loadMovementsDeferred();
         } catch (error) {
             console.error('Erro:', error);
             this.showError(error.message);
+        }
+    }
+
+    loadMovementsDeferred() {
+        const run = async () => {
+            try {
+                const movimentosData = await this.fetchMovimientos();
+                this.renderMovimientos(movimentosData);
+            } catch (error) {
+                console.error('Erro ao carregar resumo de movimentos:', error);
+                if (this.movimentosResumo) {
+                    this.movimentosResumo.innerHTML = `
+                        <div class="alert alert-warning mb-0">
+                            Não foi possível carregar o resumo de movimentações.
+                        </div>
+                    `;
+                }
+            }
+        };
+
+        if (typeof window.requestIdleCallback === 'function') {
+            window.requestIdleCallback(() => run(), { timeout: 1000 });
+        } else {
+            setTimeout(run, 0);
         }
     }
     
@@ -236,11 +257,13 @@ class Dashboard {
      */
     renderMovimientos(data) {
         if (!data.data || data.data.length === 0) {
-            this.movimientosBody.innerHTML = '<tr><td colspan="5" class="text-center py-4">Sem movimentos</td></tr>';
+            this.movimentosResumo.innerHTML = '<div class="text-center py-3 text-muted">Sem movimentações recentes.</div>';
             return;
         }
-        
-        this.movimientosBody.innerHTML = data.data.map(mov => {
+
+        const items = data.data.slice(0, 5);
+
+        this.movimentosResumo.innerHTML = items.map(mov => {
             const fecha = new Date(mov.fecha).toLocaleDateString('pt-BR', {
                 year: 'numeric',
                 month: '2-digit',
@@ -254,15 +277,19 @@ class Dashboard {
             const sinal = mov.cantidad < 0 ? '' : '+';
             
             return `
-                <tr>
-                    <td><small class="text-muted">${fecha}</small></td>
-                    <td><span class="badge bg-${tipoColor}">${this.escapeHtml(mov.tipo.toUpperCase())}</span></td>
-                    <td>${this.escapeHtml(mov.producto)}</td>
-                    <td><span class="badge bg-light text-dark">${this.escapeHtml(mov.grupo)}</span></td>
-                    <td class="text-end">
+                <div class="d-flex justify-content-between align-items-center border rounded px-3 py-2 mb-2">
+                    <div class="me-3">
+                        <div class="d-flex align-items-center gap-2 mb-1">
+                            <span class="badge bg-${tipoColor}">${this.escapeHtml(mov.tipo.toUpperCase())}</span>
+                            <span class="badge bg-light text-dark">${this.escapeHtml(mov.grupo)}</span>
+                        </div>
+                        <div><strong>${this.escapeHtml(mov.producto)}</strong></div>
+                        <small class="text-muted">${fecha}</small>
+                    </div>
+                    <div class="text-end">
                         <strong class="${quantidadeClass}">${sinal}${mov.cantidad}</strong>
-                    </td>
-                </tr>
+                    </div>
+                </div>
             `;
         }).join('');
     }
@@ -315,4 +342,3 @@ class Dashboard {
 document.addEventListener('DOMContentLoaded', () => {
     new Dashboard();
 });
-```0

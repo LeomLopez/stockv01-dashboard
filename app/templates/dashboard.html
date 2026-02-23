@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Painel - Gestão Stockv01{% endblock %}
+{% block title %}Painel - Gestão de Estoque v01{% endblock %}
 
 {% block content %}
 <div class="row">
@@ -27,35 +27,29 @@
             <!-- Aqui aparecerão os alertas -->
         </div>
         
-        <!-- Últimas Movimentações -->
+        <!-- Resumo de Movimentações -->
         <div class="row">
             <div class="col-md-12">
                 <div class="card shadow-sm">
                     <div class="card-header bg-success text-white">
-                        <h5 class="mb-0">📝 Últimas 10 Movimentações</h5>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">📝 Movimentações Recentes (Resumo)</h5>
+                            <a href="{{ url_for('main.movimientos') }}" class="btn btn-sm btn-light">
+                                Ver todas
+                            </a>
+                        </div>
                     </div>
-                    <div class="card-body p-0">
-                        <div class="table-responsive">
-                            <table class="table table-hover mb-0" id="movimientosTable">
-                                <thead class="table-light">
-                                    <tr>
-                                        <th>Data</th>
-                                        <th>Tipo</th>
-                                        <th>Produto</th>
-                                        <th>Grupo</th>
-                                        <th class="text-end">Quantidade</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="movimientosBody">
-                                    <tr>
-                                        <td colspan="5" class="text-center py-4">
-                                            <div class="spinner-border spinner-border-sm text-success" role="status">
-                                                <span class="visually-hidden">Carregando...</span>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                    <div class="card-body">
+                        <p class="text-muted mb-3">
+                            O histórico completo fica na página de Movimentações, com filtros e paginação.
+                        </p>
+                        <div id="movimentosResumo">
+                            <div class="text-center py-3">
+                                <div class="spinner-border spinner-border-sm text-success" role="status">
+                                    <span class="visually-hidden">Carregando...</span>
+                                </div>
+                                <span class="ms-2 text-muted">Carregando resumo...</span>
+                            </div>
                         </div>
                     </div>
                 </div>

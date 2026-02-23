@@ -102,4 +102,3 @@ function disableDarkMode() {
 function confirmDelete(productName) {
     return confirm(`Tem certeza que deseja excluir "${productName}"?`);
 }
-```0
