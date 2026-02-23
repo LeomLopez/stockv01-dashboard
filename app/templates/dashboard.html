@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Stockv01 Management{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1>📊 Dashboard</h1>
+            <button class="btn btn-primary" id="refreshBtn">
+                <i class="bi bi-arrow-clockwise"></i> Actualizar
+            </button>
+        </div>
+        
+        <!-- Cards de Estadísticas -->
+        <div class="row mb-4" id="statsCards">
+            <!-- Cargando -->
+            <div class="col-md-12 text-center py-4">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Cargando...</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Alertas -->
+        <div class="row mb-4" id="alertsSection">
+            <!-- Aquí irán las alertas -->
+        </div>
+        
+        <!-- Últimos Movimientos -->
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="mb-0">📝 Últimos 10 Movimientos</h5>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0" id="movimientosTable">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Fecha</th>
+                                        <th>Tipo</th>
+                                        <th>Producto</th>
+                                        <th>Grupo</th>
+                                        <th class="text-end">Cantidad</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="movimientosBody">
+                                    <tr>
+                                        <td colspan="5" class="text-center py-4">
+                                            <div class="spinner-border spinner-border-sm text-success" role="status">
+                                                <span class="visually-hidden">Cargando...</span>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Alerta de error -->
+<div class="alert alert-danger alert-dismissible fade show d-none" id="errorAlert" role="alert">
+    <strong>Error:</strong> <span id="errorMessage"></span>
+    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+{% endblock %}

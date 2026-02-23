@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block title %}Agregar Producto - Stockv01 Management{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-6 offset-md-3">
+        <h1 class="mb-4">{% if is_edit %}Editar{% else %}Agregar{% endif %} Producto</h1>
+        
+        <form method="POST" novalidate>
+            <div class="mb-3">
+                <label for="name" class="form-label">Nombre del Producto *</label>
+                <input type="text" class="form-control" id="name" name="name" required value="{{ product.name if product else '' }}">
+            </div>
+            
+            <div class="mb-3">
+                <label for="description" class="form-label">Descripción</label>
+                <textarea class="form-control" id="description" name="description" rows="3">{{ product.description if product else '' }}</textarea>
+            </div>
+            
+            <div class="mb-3">
+                <label for="quantity" class="form-label">Cantidad *</label>
+                <input type="number" class="form-control" id="quantity" name="quantity" required min="0" value="{{ product.quantity if product else 0 }}">
+            </div>
+            
+            <div class="mb-3">
+                <label for="price" class="form-label">Precio (USD) *</label>
+                <input type="number" class="form-control" id="price" name="price" required min="0" step="0.01" value="{{ product.price if product else '' }}">
+            </div>
+            
+            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                <a href="{{ url_for('main.products') }}" class="btn btn-secondary">Cancelar</a>
+                <button type="submit" class="btn btn-primary">{% if is_edit %}Actualizar{% else %}Crear{% endif %} Producto</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

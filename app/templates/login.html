@@ -1,0 +1,188 @@
+{% extends "base_login.html" %}
+
+{% block title %}Login - Stockv01 Management{% endblock %}
+
+{% block content %}
+<div class="login-container">
+    <div class="login-box">
+        <div class="text-center mb-4">
+            <h1 class="mb-2">
+                <i class="bi bi-box-seam"></i> Stockv01 Management
+            </h1>
+            <p class="text-muted">Sistema de Gestión de Inventario</p>
+        </div>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ 'danger' if category == 'error' else 'warning' if category == 'warning' else 'info' }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <form method="POST" class="needs-validation">
+            <div class="mb-3">
+                <label for="username" class="form-label">Usuario</label>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-person"></i></span>
+                    <input type="text" class="form-control" id="username" name="username" placeholder="admin" required autofocus>
+                </div>
+                <small class="form-text text-muted d-block mt-1">Usuario de prueba: <strong>admin</strong></small>
+            </div>
+
+            <div class="mb-4">
+                <label for="password" class="form-label">Contraseña</label>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-lock"></i></span>
+                    <input type="password" class="form-control" id="password" name="password" placeholder="admin123" required>
+                </div>
+                <small class="form-text text-muted d-block mt-1">Contraseña de prueba: <strong>admin123</strong></small>
+            </div>
+
+            <button type="submit" class="btn btn-primary w-100 mb-3">
+                <i class="bi bi-box-arrow-in-right"></i> Iniciar Sesión
+            </button>
+
+            <hr>
+
+            <div class="alert alert-info">
+                <small><strong>Credenciales de prueba:</strong><br>
+                Usuario: <code>admin</code><br>
+                Contraseña: <code>admin123</code></small>
+            </div>
+        </form>
+
+        <div class="text-center mt-4">
+            <small class="text-muted">
+                &copy; 2026 Stockv01 Management. Sistema seguro.
+            </small>
+        </div>
+    </div>
+</div>
+
+<style>
+    body {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+
+    .login-container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        padding: 20px;
+    }
+
+    .login-box {
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        padding: 40px;
+        width: 100%;
+        max-width: 400px;
+        animation: slideIn 0.3s ease-out;
+    }
+
+    @keyframes slideIn {
+        from {
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .login-box h1 {
+        color: #333;
+        font-weight: 600;
+    }
+
+    .input-group-text {
+        background-color: #f8f9fa;
+        border-color: #dee2e6;
+        color: #667eea;
+    }
+
+    .form-control:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border: none;
+        padding: 10px;
+        font-weight: 500;
+        transition: transform 0.2s;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+    }
+
+    .alert-info {
+        background-color: #cfe2ff;
+        border-color: #b6d4fe;
+        color: #084298;
+    }
+
+    code {
+        background-color: #f8f9fa;
+        padding: 2px 6px;
+        border-radius: 3px;
+        color: #667eea;
+        font-weight: 500;
+    }
+
+    body.dark-mode {
+        background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    }
+
+    body.dark-mode .login-box {
+        background: #2a2a2a;
+        color: #e0e0e0;
+    }
+
+    body.dark-mode .login-box h1 {
+        color: #e0e0e0;
+    }
+
+    body.dark-mode .text-muted {
+        color: #999 !important;
+    }
+
+    body.dark-mode .form-control {
+        background-color: #3a3a3a;
+        color: #e0e0e0;
+        border-color: #444;
+    }
+
+    body.dark-mode .form-control:focus {
+        background-color: #3a3a3a;
+        color: #e0e0e0;
+        border-color: #667eea;
+    }
+
+    body.dark-mode .input-group-text {
+        background-color: #3a3a3a;
+        border-color: #444;
+    }
+
+    body.dark-mode .alert-info {
+        background-color: #1a3a52;
+        border-color: #0dcaf0;
+        color: #b8daff;
+    }
+
+    body.dark-mode code {
+        background-color: #3a3a3a;
+        color: #667eea;
+    }
+</style>
+{% endblock %}

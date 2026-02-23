@@ -1,0 +1,154 @@
+{% extends "base.html" %}
+
+{% block title %}Stock - Stockv01 Management{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <h1 class="mb-4">📦 Stock Actual</h1>
+        
+        <!-- Filtros -->
+        <div class="card mb-4 shadow-sm">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">🔍 Filtros</h5>
+            </div>
+            <div class="card-body">
+                <form id="filterForm" class="row g-3">
+                    <!-- Grupo -->
+                    <div class="col-md-3">
+                        <label for="grupoFilter" class="form-label">Grupo</label>
+                        <select class="form-select" id="grupoFilter">
+                            <option value="">Todos</option>
+                            {%- if grupos %}
+                                {%- for g in grupos %}
+                                    {%- if g != 'Electrónica' %}
+                                        <option value="{{ g }}">{{ g }}</option>
+                                    {%- endif %}
+                                {%- endfor %}
+                            {%- else %}
+                                <option value="CON">CON</option>
+                            {%- endif %}
+                        </select>
+                    </div>
+                    
+                    <!-- Producto -->
+                    <div class="col-md-3">
+                        <label for="productoFilter" class="form-label">Producto</label>
+                        <input type="text" class="form-control" id="productoFilter" placeholder="Buscar producto...">
+                    </div>
+                    
+                    <!-- Contenedor -->
+                    <div class="col-md-3">
+                        <label for="contenedorFilter" class="form-label">Contenedor</label>
+                        <select class="form-select" id="contenedorFilter">
+                            <option value="">Todos</option>
+                            <option value="C1">C1</option>
+                            <option value="C2">C2</option>
+                            <option value="C3">C3</option>
+                        </select>
+                    </div>
+                    
+                    <!-- Botón Filtrar -->
+                    <div class="col-md-3 d-flex align-items-end">
+                        <button type="button" class="btn btn-primary w-100" id="filterBtn">
+                            <i class="bi bi-search"></i> Filtrar
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Indicadores -->
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <h6 class="card-title text-muted">Total Registros</h6>
+                        <h3 class="mb-0" id="totalCount">0</h3>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <h6 class="card-title text-muted">Mostrados</h6>
+                        <h3 class="mb-0" id="shownCount">0</h3>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-center border-warning">
+                    <div class="card-body">
+                        <h6 class="card-title text-muted">Stock Bajo</h6>
+                        <h3 class="mb-0 text-warning" id="lowStockCount">0</h3>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-center border-danger">
+                    <div class="card-body">
+                        <h6 class="card-title text-muted">Sin Stock</h6>
+                        <h3 class="mb-0 text-danger" id="noStockCount">0</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Tabla -->
+        <div class="card shadow-sm">
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0" id="stockTable">
+                        <thead class="table-dark text-white">
+                            <tr>
+                                <th>Grupo</th>
+                                <th>Producto</th>
+                                <th class="text-end">Cantidad</th>
+                                <th>Contenedor</th>
+                                <th>Fecha Producto</th>
+                            </tr>
+                        </thead>
+                        <tbody id="stockTableBody">
+                            <tr class="text-center">
+                                <td colspan="5" class="py-4">
+                                    <div class="spinner-border text-primary" role="status">
+                                        <span class="visually-hidden">Cargando...</span>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Paginación -->
+        <div class="d-flex justify-content-between align-items-center mt-4">
+            <div>
+                <small class="text-muted" id="paginationInfo">Página 1 de 1</small>
+            </div>
+            <div>
+                <button class="btn btn-sm btn-outline-primary me-2" id="prevBtn" disabled>← Anterior</button>
+                <button class="btn btn-sm btn-outline-primary" id="nextBtn" disabled>Siguiente →</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Mensaje de error -->
+<div class="alert alert-danger alert-dismissible fade show d-none" id="errorAlert" role="alert">
+    <strong>Error:</strong> <span id="errorMessage"></span>
+    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+</div>
+
+<!-- Mensaje sin resultados -->
+<div class="alert alert-info mt-4 d-none text-center" id="noResultsAlert" role="alert">
+    <h5>📭 Sin resultados</h5>
+    <p>No se encontraron registros que coincidan con los filtros aplicados.</p>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/stock.js') }}"></script>
+{% endblock %}

@@ -1,0 +1,171 @@
+{% extends "base.html" %}
+
+{% block title %}Movimientos - Stockv01 Management{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <h1 class="mb-4">📊 Movimientos de Inventario</h1>
+        
+        <!-- Filtros -->
+        <div class="card mb-4 shadow-sm">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0">🔍 Filtros</h5>
+            </div>
+            <div class="card-body">
+                <form id="filterForm" class="row g-3">
+                    <!-- Fecha Desde -->
+                    <div class="col-md-2">
+                        <label for="fechaDesdeFilter" class="form-label">Desde</label>
+                        <input type="date" class="form-control" id="fechaDesdeFilter">
+                    </div>
+                    
+                    <!-- Fecha Hasta -->
+                    <div class="col-md-2">
+                        <label for="fechaHastaFilter" class="form-label">Hasta</label>
+                        <input type="date" class="form-control" id="fechaHastaFilter">
+                    </div>
+                    
+                    <!-- Tipo -->
+                    <div class="col-md-3">
+                        <label for="tipoFilter" class="form-label">Tipo</label>
+                        <select class="form-select" id="tipoFilter">
+                            <option value="">Todos</option>
+                            <option value="entrada">Entrada</option>
+                            <option value="saida">Salida</option>
+                            <option value="descarte">Descarte</option>
+                            <option value="ajuste">Ajuste</option>
+                        </select>
+                    </div>
+                    
+                    <!-- Grupo -->
+                    <div class="col-md-2">
+                        <label for="grupoFilter" class="form-label">Grupo</label>
+                        <input type="text" class="form-control" id="grupoFilter" placeholder="Ej: Electrónica">
+                    </div>
+                    
+                    <!-- Botón Filtrar -->
+                    <div class="col-md-3 d-flex align-items-end">
+                        <button type="button" class="btn btn-info w-100" id="filterBtn">
+                            <i class="bi bi-search"></i> Filtrar
+                        </button>
+                        <button type="button" class="btn btn-secondary w-100 ms-2" id="resetBtn">
+                            Limpiar
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Indicadores -->
+        <div class="row mb-4">
+            <div class="col-md-2">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <h6 class="card-title text-muted">Total</h6>
+                        <h3 class="mb-0" id="totalCount">0</h3>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="card text-center border-success">
+                    <div class="card-body">
+                        <h6 class="card-title text-muted">Entradas</h6>
+                        <h3 class="mb-0 text-success" id="entradaCount">0</h3>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="card text-center border-danger">
+                    <div class="card-body">
+                        <h6 class="card-title text-muted">Saidas</h6>
+                        <h3 class="mb-0 text-danger" id="saidaCount">0</h3>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="card text-center border-warning">
+                    <div class="card-body">
+                        <h6 class="card-title text-muted">Descartes</h6>
+                        <h3 class="mb-0 text-warning" id="descarteCount">0</h3>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="card text-center border-primary">
+                    <div class="card-body">
+                        <h6 class="card-title text-muted">Ajustes</h6>
+                        <h3 class="mb-0 text-primary" id="ajusteCount">0</h3>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <h6 class="card-title text-muted">Mostrados</h6>
+                        <h3 class="mb-0" id="shownCount">0</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Tabla -->
+        <div class="card shadow-sm">
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0" id="movimientosTable">
+                        <thead class="table-dark text-white">
+                            <tr>
+                                <th>Fecha</th>
+                                <th>Tipo</th>
+                                <th>Grupo</th>
+                                <th>Producto</th>
+                                <th class="text-end">Cantidad</th>
+                                <th>Descripción</th>
+                                <th>Usuario</th>
+                            </tr>
+                        </thead>
+                        <tbody id="movimientosTableBody">
+                            <tr class="text-center">
+                                <td colspan="7" class="py-4">
+                                    <div class="spinner-border text-info" role="status">
+                                        <span class="visually-hidden">Cargando...</span>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Paginación -->
+        <div class="d-flex justify-content-between align-items-center mt-4">
+            <div>
+                <small class="text-muted" id="paginationInfo">Página 1 de 1</small>
+            </div>
+            <div>
+                <button class="btn btn-sm btn-outline-info me-2" id="prevBtn" disabled>← Anterior</button>
+                <button class="btn btn-sm btn-outline-info" id="nextBtn" disabled>Siguiente →</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Mensaje de error -->
+<div class="alert alert-danger alert-dismissible fade show d-none" id="errorAlert" role="alert">
+    <strong>Error:</strong> <span id="errorMessage"></span>
+    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+</div>
+
+<!-- Mensaje sin resultados -->
+<div class="alert alert-info mt-4 d-none text-center" id="noResultsAlert" role="alert">
+    <h5>📭 Sin resultados</h5>
+    <p>No se encontraron movimientos que coincidan con los filtros aplicados.</p>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/movimientos.js') }}"></script>
+{% endblock %}
