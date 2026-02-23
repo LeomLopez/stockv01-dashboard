@@ -1,13 +1,13 @@
 {% extends "base.html" %}
 
-{% block title %}Productos - Stockv01 Management{% endblock %}
+{% block title %}Produtos - Gestão Stockv01{% endblock %}
 
 {% block content %}
 <div class="row">
     <div class="col-md-12">
         <div class="d-flex justify-content-between align-items-center mb-4">
-            <h1>Productos</h1>
-            <a href="{{ url_for('main.add_product') }}" class="btn btn-success">+ Agregar Producto</a>
+            <h1>Produtos</h1>
+            <a href="{{ url_for('main.add_product') }}" class="btn btn-success">+ Adicionar Produto</a>
         </div>
         
         {% if products %}
@@ -16,11 +16,11 @@
                     <thead class="table-dark">
                         <tr>
                             <th>ID</th>
-                            <th>Nombre</th>
-                            <th>Descripción</th>
-                            <th>Cantidad</th>
-                            <th>Precio</th>
-                            <th>Acciones</th>
+                            <th>Nome</th>
+                            <th>Descrição</th>
+                            <th>Quantidade</th>
+                            <th>Preço</th>
+                            <th>Ações</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -28,16 +28,23 @@
                             <tr>
                                 <td>{{ product.id }}</td>
                                 <td>{{ product.name }}</td>
-                                <td>{{ product.description[:50] }}{% if product.description|length > 50 %}...{% endif %}</td>
+                                <td>
+                                    {{ product.description[:50] }}
+                                    {% if product.description|length > 50 %}...{% endif %}
+                                </td>
                                 <td>
                                     <span class="badge bg-{% if product.quantity > 0 %}primary{% else %}danger{% endif %}">
                                         {{ product.quantity }}
                                     </span>
                                 </td>
-                                <td>${{ "%.2f"|format(product.price) }}</td>
+                                <td>R$ {{ "%.2f"|format(product.price) }}</td>
                                 <td>
                                     <a href="{{ url_for('main.edit_product', id=product.id) }}" class="btn btn-sm btn-warning">Editar</a>
-                                    <a href="{{ url_for('main.delete_product', id=product.id) }}" class="btn btn-sm btn-danger" onclick="return confirm('¿Estás seguro?')">Eliminar</a>
+                                    <a href="{{ url_for('main.delete_product', id=product.id) }}" 
+                                       class="btn btn-sm btn-danger"
+                                       onclick="return confirm('Tem certeza que deseja excluir?')">
+                                       Excluir
+                                    </a>
                                 </td>
                             </tr>
                         {% endfor %}
@@ -46,7 +53,8 @@
             </div>
         {% else %}
             <div class="alert alert-info" role="alert">
-                No hay productos registrados. <a href="{{ url_for('main.add_product') }}">Crear uno</a>
+                Não há produtos cadastrados. 
+                <a href="{{ url_for('main.add_product') }}">Criar um agora</a>
             </div>
         {% endif %}
     </div>
