@@ -153,12 +153,9 @@ class StockManager {
                 quantidade < 10 ? 'text-warning fw-bold' : '';
 
             const dataProduto = item.fecha_producto
-                ? new Date(item.fecha_producto).toLocaleDateString('pt-BR', {
-                    year: 'numeric',
-                    month: '2-digit',
-                    day: '2-digit'
-                })
-                : '-';
+              ? 
+            item.fecha_producto.split('-').reverse().join('/')
+             : '-';
 
             return `
                 <tr class="${rowClass}">
