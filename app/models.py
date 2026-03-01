@@ -69,6 +69,7 @@ class Movimiento(db.Model):
     fecha_producto = db.Column(db.Date, index=True)
     unidade = db.Column(db.String(100))
     grupo = db.Column(db.String(100), nullable=False, index=True)
+    concepto = db.Column(db.String(100), nullable=True, index=True)
     fecha_movimiento = db.Column(db.DateTime, index=True)
     contenedor = db.Column(db.String(100), index=True)
     
@@ -80,6 +81,7 @@ class Movimiento(db.Model):
             'id': self.id,
             'tipo': self.tipo or 'ajuste',
             'grupo': self.grupo,
+            'concepto': self.concepto or 'desconocido',
             'producto': self.nombre,
             'cantidad': self.cantidad,
             'descripcion': f'{self.unidade} de {self.nombre}',

@@ -1,7 +1,8 @@
 from flask import Blueprint, request, jsonify
-from datetime import datetime
+from datetime import datetime, timedelta
 from app.models import db, StockActual, Movimiento
 import logging
+from sqlalchemy import func
 
 # Configurar logging
 logger = logging.getLogger(__name__)
@@ -205,7 +206,7 @@ def get_movimientos():
         # Obtener parámetros de filtro
         fecha_desde = request.args.get('fecha_desde')
         fecha_hasta = request.args.get('fecha_hasta')
-        tipo = request.args.get('tipo', '').strip()
+        tipo_raw = request.args.get('tipo', '').strip().lower()
         grupo = request.args.get('grupo', '').strip()
         producto = request.args.get('producto', '').strip()
         
@@ -232,6 +233,9 @@ def get_movimientos():
                     400,
                     {'received': fecha_desde}
                 )
+            # Para data sem horário, manter início do dia.
+            if len(fecha_desde.strip()) == 10:
+                fecha_desde_dt = fecha_desde_dt.replace(hour=0, minute=0, second=0, microsecond=0)
         
         if fecha_hasta:
             fecha_hasta_dt = safe_datetime(fecha_hasta)
@@ -241,6 +245,9 @@ def get_movimientos():
                     400,
                     {'received': fecha_hasta}
                 )
+            # Para data sem horário, incluir todo o dia (23:59:59.999999).
+            if len(fecha_hasta.strip()) == 10:
+                fecha_hasta_dt = fecha_hasta_dt + timedelta(days=1) - timedelta(microseconds=1)
         
         # Validar que fecha_desde <= fecha_hasta
         if fecha_desde_dt and fecha_hasta_dt and fecha_desde_dt > fecha_hasta_dt:
@@ -249,14 +256,22 @@ def get_movimientos():
                 400
             )
         
-        # Validar tipo si se proporciona
-        if tipo:
-            tipos_validos = ['entrada', 'salida', 'ajuste']
-            if tipo not in tipos_validos:
-                return error_response(
-                    f'Parâmetro tipo inválido. Valores válidos: {", ".join(tipos_validos)}',
-                    400
-                )
+        # Normalizar/validar tipo si se proporciona
+        tipo_map = {
+            'entrada': 'entrada',
+            'saida': 'saida',
+            'salida': 'saida',
+            'saída': 'saida',
+            'descarte': 'descarte',
+            'ajuste': 'ajuste'
+        }
+        tipo = tipo_map.get(tipo_raw, '')
+        if tipo_raw and not tipo:
+            tipos_validos = ['entrada', 'saida', 'descarte', 'ajuste']
+            return error_response(
+                f'Parâmetro tipo inválido. Valores válidos: {", ".join(tipos_validos)}',
+                400
+            )
         
         # Construir consulta base
         query = Movimiento.query
@@ -270,7 +285,7 @@ def get_movimientos():
         
         # Aplicar filtros de texto
         if tipo:
-            query = query.filter(Movimiento.tipo == tipo)
+            query = query.filter(func.lower(Movimiento.tipo) == tipo)
         
         if grupo:
             query = query.filter(Movimiento.grupo.ilike(f'%{grupo}%'))

@@ -1,9 +1,19 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify, session
 from functools import wraps
+from datetime import datetime, timezone, timedelta
+from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 from app.models import db, Product, StockActual, Movimiento
 from app.auth import verify_credentials
 
 main_bp = Blueprint('main', __name__)
+
+
+def _sao_paulo_tz():
+    try:
+        return ZoneInfo('America/Sao_Paulo')
+    except ZoneInfoNotFoundError:
+        # Fallback para ambientes sem base de dados de timezone instalada.
+        return timezone(timedelta(hours=-3))
 
 
 def login_required(f):
@@ -82,6 +92,16 @@ def movimientos():
     grupos_q = db.session.query(Movimiento.grupo).distinct().order_by(Movimiento.grupo).all()
     grupos = [g[0] for g in grupos_q if g and g[0]]
     return render_template('movimientos.html', grupos=grupos)
+
+
+@main_bp.route('/resumo-diario')
+@login_required
+def resumo_diario():
+    """Página de resumo diário por área/conceito"""
+    destinos = ['alm', 'jan', 'kit', 'cof']
+
+    today_sp = datetime.now(_sao_paulo_tz()).date().isoformat()
+    return render_template('resumo_diario.html', destinos=destinos, default_date=today_sp)
 
 @main_bp.route('/products')
 def products():

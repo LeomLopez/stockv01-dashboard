@@ -1,0 +1,140 @@
+{% extends "base.html" %}
+
+{% block title %}Resumo Diário - Gestão de Estoque v01{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <h1 class="mb-4">📘 Resumo Diário</h1>
+
+        <div class="card mb-4 shadow-sm">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">🔎 Filtros</h5>
+            </div>
+            <div class="card-body">
+                <form id="resumoFilterForm" class="row g-3">
+                    <div class="col-md-4">
+                        <label for="fechaFilter" class="form-label">Data</label>
+                        <input type="date" class="form-control" id="fechaFilter" value="{{ default_date }}">
+                    </div>
+                    <div class="col-md-5">
+                        <label for="destinoFilter" class="form-label">Destino (conceito)</label>
+                        <select class="form-select" id="destinoFilter">
+                            <option value="">Todos</option>
+                            {% for destino in destinos %}
+                            <option value="{{ destino }}">{{ destino }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-3 d-flex align-items-end gap-2">
+                        <button type="submit" class="btn btn-primary w-50" id="buscarResumoBtn">Buscar</button>
+                        <button type="button" class="btn btn-outline-success w-50" id="exportNetoBtn">Exportar por Serviço (Neto)</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="row mb-3">
+            <div class="col-md-12">
+                <div class="card text-center border-primary shadow">
+                    <div class="card-body py-4">
+                        <h5 class="card-title text-uppercase text-muted mb-2">Neto consumido</h5>
+                        <div class="display-4 fw-bold text-primary" id="netoConsumidoCard">0</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="card border-danger text-center">
+                    <div class="card-body">
+                        <h6 class="card-title text-muted">Saídas (bruto)</h6>
+                        <h3 class="mb-0 text-danger" id="saidasBrutoCard">0</h3>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card border-success text-center">
+                    <div class="card-body">
+                        <h6 class="card-title text-muted">Voltas</h6>
+                        <h3 class="mb-0 text-success" id="voltasCard">0</h3>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card border-info text-center">
+                    <div class="card-body">
+                        <h6 class="card-title text-muted">Compras (fornecedor)</h6>
+                        <h3 class="mb-0 text-info" id="comprasFornecedorCard">0</h3>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card border-warning text-center">
+                    <div class="card-body">
+                        <h6 class="card-title text-muted">Descartes</h6>
+                        <h3 class="mb-0 text-warning" id="descartesCard">0</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card mb-4 shadow-sm">
+            <div class="card-header bg-light">
+                <h6 class="mb-0">Soma por Tipo</h6>
+            </div>
+            <div class="card-body" id="porTipoContainer">
+                <span class="text-muted">Sem dados.</span>
+            </div>
+        </div>
+
+        <div class="card mb-4 shadow-sm">
+            <div class="card-header bg-light">
+                <h6 class="mb-0">Saídas por Destino</h6>
+            </div>
+            <div class="card-body" id="saidasPorDestinoContainer">
+                <span class="text-muted">Sem dados.</span>
+            </div>
+        </div>
+
+        <div class="card mb-4 shadow-sm">
+            <div class="card-header bg-light">
+                <h6 class="mb-0">Consumo por Produto e Destino (Saídas - Voltas)</h6>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-sm table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Produto</th>
+                                <th>Destino</th>
+                                <th class="text-end">Saídas</th>
+                                <th class="text-end">Voltas</th>
+                                <th class="text-end">Neto</th>
+                            </tr>
+                        </thead>
+                        <tbody id="consumoPorItemBody">
+                            <tr>
+                                <td colspan="5" class="text-center py-3 text-muted">Sem dados.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<div class="alert alert-danger mt-4 d-none" id="resumoErrorAlert" role="alert">
+    <strong>Erro:</strong> <span id="resumoErrorMessage"></span>
+</div>
+<div class="alert alert-success mt-3 d-none" id="resumoSuccessAlert" role="alert">
+    <span id="resumoSuccessMessage"></span>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/resumo_diario.js') }}"></script>
+{% endblock %}

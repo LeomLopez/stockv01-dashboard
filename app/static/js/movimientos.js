@@ -26,6 +26,7 @@ class MovimientosManager {
      */
     initializeElements() {
         // Filtros
+        this.filterForm = document.getElementById('filterForm');
         this.fechaDesdeFilter = document.getElementById('fechaDesdeFilter');
         this.fechaHastaFilter = document.getElementById('fechaHastaFilter');
         this.tipoFilter = document.getElementById('tipoFilter');
@@ -62,6 +63,10 @@ class MovimientosManager {
      */
     attachEventListeners() {
         this.filterBtn.addEventListener('click', () => this.onFilterClick());
+        this.filterForm.addEventListener('submit', (event) => {
+            event.preventDefault();
+            this.onFilterClick();
+        });
         this.resetBtn.addEventListener('click', () => this.onResetClick());
         this.prevBtn.addEventListener('click', () => this.previousPage());
         this.nextBtn.addEventListener('click', () => this.nextPage());
@@ -101,11 +106,11 @@ class MovimientosManager {
             const params = this.buildFilterParams();
             const response = await fetch(`/api/movimientos?${params}`);
 
-            if (!response.ok) {
-                throw new Error(`Erro HTTP: ${response.status}`);
-            }
-
             const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.error || `Erro HTTP: ${response.status}`);
+            }
 
             if (!data.success) {
                 throw new Error(data.error || 'Erro ao carregar movimentos');
