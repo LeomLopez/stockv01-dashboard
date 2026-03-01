@@ -216,13 +216,13 @@ class ResumoDiarioManager {
 
     formatFechaProducto(value) {
         if (!value) return '<span class="text-muted">-</span>';
-        const fecha = new Date(value);
-        if (Number.isNaN(fecha.getTime())) return '<span class="text-muted">-</span>';
-        return this.escapeHtml(fecha.toLocaleDateString('pt-BR', {
-            year: 'numeric',
-            month: '2-digit',
-            day: '2-digit'
-        }));
+        const raw = String(value).trim();
+        const datePart = raw.includes('T') ? raw.split('T')[0] : raw;
+        const parts = datePart.split('-');
+        if (parts.length !== 3) return '<span class="text-muted">-</span>';
+        const [year, month, day] = parts;
+        if (!year || !month || !day) return '<span class="text-muted">-</span>';
+        return this.escapeHtml(`${day}/${month}/${year}`);
     }
 
     escapeHtml(text) {
