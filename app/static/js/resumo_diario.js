@@ -161,7 +161,7 @@ class ResumoDiarioManager {
             const saidas = item.saidas ?? 0;
             const voltas = item.voltas ?? 0;
             const neto = item.neto ?? 0;
-            const fechaLiberacao = this.formatFechaLiberacao(item.fecha_liberacao);
+            const fechaProducto = this.formatFechaProducto(item.fecha_producto);
             return `
                 <tr>
                     <td>${producto}</td>
@@ -169,7 +169,7 @@ class ResumoDiarioManager {
                     <td class="text-end">${saidas}</td>
                     <td class="text-end">${voltas}</td>
                     <td class="text-end"><strong>${neto}</strong></td>
-                    <td>${fechaLiberacao}</td>
+                    <td>${fechaProducto}</td>
                 </tr>
             `;
         }).join('');
@@ -214,7 +214,7 @@ class ResumoDiarioManager {
         return labels[raw] || raw.toUpperCase();
     }
 
-    formatFechaLiberacao(value) {
+    formatFechaProducto(value) {
         if (!value) return '<span class="text-muted">-</span>';
         const fecha = new Date(value);
         if (Number.isNaN(fecha.getTime())) return '<span class="text-muted">-</span>';
