@@ -344,7 +344,8 @@ def get_resumo_diario():
                 Movimiento.nombre.label('producto'),
                 destino_label.label('destino'),
                 func.coalesce(func.sum(case((tipo_norm == 'saida', Movimiento.cantidad), else_=0)), 0).label('saidas'),
-                func.coalesce(func.sum(case((tipo_norm == 'entrada', Movimiento.cantidad), else_=0)), 0).label('voltas')
+                func.coalesce(func.sum(case((tipo_norm == 'entrada', Movimiento.cantidad), else_=0)), 0).label('voltas'),
+                func.max(case((tipo_norm == 'saida', Movimiento.fecha_movimiento), else_=None)).label('ultima_liberacao')
             )
             .group_by(Movimiento.nombre, destino_label)
             .order_by(Movimiento.nombre.asc(), destino_label.asc())
@@ -361,7 +362,8 @@ def get_resumo_diario():
                 'destino_label': _destino_display(destino),
                 'saidas': saidas_item,
                 'voltas': voltas_item,
-                'neto': saidas_item - voltas_item
+                'neto': saidas_item - voltas_item,
+                'fecha_liberacao': row.ultima_liberacao.isoformat() if row.ultima_liberacao else None
             })
 
         return jsonify({

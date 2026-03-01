@@ -151,7 +151,7 @@ class ResumoDiarioManager {
 
     renderConsumoPorItem(items) {
         if (!items.length) {
-            this.consumoPorItemBody.innerHTML = '<tr><td colspan="5" class="text-center py-3 text-muted">Sem dados para os filtros selecionados.</td></tr>';
+            this.consumoPorItemBody.innerHTML = '<tr><td colspan="6" class="text-center py-3 text-muted">Sem dados para os filtros selecionados.</td></tr>';
             return;
         }
 
@@ -161,6 +161,7 @@ class ResumoDiarioManager {
             const saidas = item.saidas ?? 0;
             const voltas = item.voltas ?? 0;
             const neto = item.neto ?? 0;
+            const fechaLiberacao = this.formatFechaLiberacao(item.fecha_liberacao);
             return `
                 <tr>
                     <td>${producto}</td>
@@ -168,6 +169,7 @@ class ResumoDiarioManager {
                     <td class="text-end">${saidas}</td>
                     <td class="text-end">${voltas}</td>
                     <td class="text-end"><strong>${neto}</strong></td>
+                    <td>${fechaLiberacao}</td>
                 </tr>
             `;
         }).join('');
@@ -176,7 +178,7 @@ class ResumoDiarioManager {
     showLoading() {
         this.porTipoContainer.innerHTML = '<span class="text-muted">Carregando...</span>';
         this.saidasPorDestinoContainer.innerHTML = '<span class="text-muted">Carregando...</span>';
-        this.consumoPorItemBody.innerHTML = '<tr><td colspan="5" class="text-center py-3 text-muted">Carregando...</td></tr>';
+        this.consumoPorItemBody.innerHTML = '<tr><td colspan="6" class="text-center py-3 text-muted">Carregando...</td></tr>';
     }
 
     showError(message) {
@@ -210,6 +212,19 @@ class ResumoDiarioManager {
         };
         if (!raw) return 'Desconocido';
         return labels[raw] || raw.toUpperCase();
+    }
+
+    formatFechaLiberacao(value) {
+        if (!value) return '<span class="text-muted">-</span>';
+        const fecha = new Date(value);
+        if (Number.isNaN(fecha.getTime())) return '<span class="text-muted">-</span>';
+        return this.escapeHtml(fecha.toLocaleString('pt-BR', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit'
+        }));
     }
 
     escapeHtml(text) {
