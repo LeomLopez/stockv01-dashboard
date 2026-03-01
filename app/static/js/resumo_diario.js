@@ -218,12 +218,10 @@ class ResumoDiarioManager {
         if (!value) return '<span class="text-muted">-</span>';
         const fecha = new Date(value);
         if (Number.isNaN(fecha.getTime())) return '<span class="text-muted">-</span>';
-        return this.escapeHtml(fecha.toLocaleString('pt-BR', {
+        return this.escapeHtml(fecha.toLocaleDateString('pt-BR', {
             year: 'numeric',
             month: '2-digit',
-            day: '2-digit',
-            hour: '2-digit',
-            minute: '2-digit'
+            day: '2-digit'
         }));
     }
 
