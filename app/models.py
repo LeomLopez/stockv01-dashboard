@@ -83,6 +83,7 @@ class Movimiento(db.Model):
             'grupo': self.grupo,
             'concepto': self.concepto or 'desconocido',
             'producto': self.nombre,
+            'fecha_producto': self.fecha_producto.isoformat() if self.fecha_producto else None,
             'cantidad': self.cantidad,
             'descripcion': f'{self.unidade} de {self.nombre}',
             'fecha': self.fecha_movimiento.isoformat() if self.fecha_movimiento else None,

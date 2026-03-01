@@ -271,6 +271,7 @@ class Dashboard {
                 hour: '2-digit',
                 minute: '2-digit'
             });
+            const fechaProducto = this.formatProductDate(mov.fecha_producto);
             
             const tipoColor = this.getTipoColor(mov.tipo);
             const quantidadeClass = mov.cantidad < 0 ? 'text-danger' : 'text-success';
@@ -284,6 +285,7 @@ class Dashboard {
                             <span class="badge bg-light text-dark">${this.escapeHtml(mov.grupo)}</span>
                         </div>
                         <div><strong>${this.escapeHtml(mov.producto)}</strong></div>
+                        <small class="text-muted d-block">Data do produto: ${fechaProducto}</small>
                         <small class="text-muted">${fecha}</small>
                     </div>
                     <div class="text-end">
@@ -305,6 +307,15 @@ class Dashboard {
             'ajuste': 'primary'
         };
         return colors[tipo] || 'secondary';
+    }
+
+    formatProductDate(value) {
+        if (!value || typeof value !== 'string') return '-';
+        const parts = value.split('-');
+        if (parts.length !== 3) return '-';
+        const [year, month, day] = parts;
+        if (!year || !month || !day) return '-';
+        return `${day}/${month}/${year}`;
     }
     
     /**
