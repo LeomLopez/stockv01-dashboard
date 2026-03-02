@@ -156,7 +156,9 @@ class ResumoDiarioManager {
         }
 
         this.consumoPorItemBody.innerHTML = items.map((item) => {
-            const producto = this.escapeHtml((item.producto || 'desconocido').toString());
+            const productoBase = (item.producto || 'desconocido').toString();
+            const unidade = (item.unidade || '').toString().trim();
+            const producto = this.escapeHtml(unidade ? `${productoBase} (${unidade})` : productoBase);
             const destino = this.escapeHtml((item.destino_label || this.formatDestino(item.destino) || 'Desconocido').toString());
             const saidas = item.saidas ?? 0;
             const voltas = item.voltas ?? 0;

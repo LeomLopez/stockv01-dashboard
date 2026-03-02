@@ -62,6 +62,14 @@ def _format_qty(value):
     return f'{qty:.2f}'.rstrip('0').rstrip('.')
 
 
+def _format_qty_with_unit(value, unit_value):
+    qty_text = _format_qty(value)
+    unit_text = (unit_value or '').strip()
+    if not unit_text:
+        return qty_text
+    return f'{qty_text} {unit_text}'
+
+
 def _build_whatsapp_export_text(fecha_obj, grouped_data):
     lines = [
         '📊 Consumo Neto por Serviço',
@@ -77,7 +85,8 @@ def _build_whatsapp_export_text(fecha_obj, grouped_data):
         lines.append(_service_header(service))
         for item in items:
             neto = item['neto']
-            lines.append(f"• {item['producto']} - {_format_qty(neto)}")
+            neto_text = _format_qty_with_unit(neto, item.get('unidade'))
+            lines.append(f"• {item['producto']} - {neto_text}")
         lines.append('')
 
     # Evita newline final extra
@@ -283,6 +292,7 @@ def get_resumo_diario():
 
         concepto_norm = func.lower(func.trim(func.coalesce(Movimiento.concepto, '')))
         tipo_norm = func.lower(func.trim(func.coalesce(Movimiento.tipo, '')))
+        unidade_norm = func.nullif(func.trim(func.coalesce(Movimiento.unidade, '')), '')
         is_service_concept = concepto_norm.in_(SERVICE_CONCEPTS)
         in_day = (
             Movimiento.fecha_movimiento >= day_start,
@@ -343,6 +353,7 @@ def get_resumo_diario():
             consumo_query.with_entities(
                 Movimiento.nombre.label('producto'),
                 destino_label.label('destino'),
+                func.max(unidade_norm).label('unidade'),
                 func.coalesce(func.sum(case((tipo_norm == 'saida', Movimiento.cantidad), else_=0)), 0).label('saidas'),
                 func.coalesce(func.sum(case((tipo_norm == 'entrada', Movimiento.cantidad), else_=0)), 0).label('voltas'),
                 func.max(case((tipo_norm == 'saida', Movimiento.fecha_producto), else_=None)).label('fecha_producto')
@@ -358,6 +369,7 @@ def get_resumo_diario():
             voltas_item = int(row.voltas or 0)
             consumo_por_item.append({
                 'producto': row.producto or 'desconocido',
+                'unidade': (row.unidade or '').strip(),
                 'destino': destino,
                 'destino_label': _destino_display(destino),
                 'saidas': saidas_item,
@@ -426,11 +438,13 @@ def export_consumo_neto_por_servico():
 
         concepto_norm = func.lower(func.trim(func.coalesce(Movimiento.concepto, '')))
         tipo_norm = func.lower(func.trim(func.coalesce(Movimiento.tipo, '')))
+        unidade_norm = func.nullif(func.trim(func.coalesce(Movimiento.unidade, '')), '')
 
         rows = (
             db.session.query(
                 Movimiento.nombre.label('producto'),
                 concepto_norm.label('servicio'),
+                func.max(unidade_norm).label('unidade'),
                 func.coalesce(func.sum(case((tipo_norm == 'saida', Movimiento.cantidad), else_=0)), 0).label('liberado'),
                 func.coalesce(func.sum(case((tipo_norm == 'entrada', Movimiento.cantidad), else_=0)), 0).label('voltas')
             )
@@ -458,6 +472,7 @@ def export_consumo_neto_por_servico():
                 continue
             item = {
                 'producto': row.producto or 'desconocido',
+                'unidade': (row.unidade or '').strip(),
                 'liberado': liberado,
                 'voltas': voltas,
                 'neto': neto
